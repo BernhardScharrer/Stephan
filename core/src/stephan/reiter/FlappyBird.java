@@ -18,7 +18,7 @@ public class FlappyBird {
 	private Sprite sprite;
 	
 	private static final double UPPER_CAP = 1.0;
-	private static final double LOWER_CAP = -0.6;
+	private static final double LOWER_CAP = -1.0;
 	
 	public FlappyBird() {
 		player_image = new Texture("flappy.png");
@@ -39,15 +39,17 @@ public class FlappyBird {
 		sprite.draw(drawer);
 //		drawer.draw(player_image, pos.x, pos.y, 0, 0, pos.getWidth(), pos.getHeight(), pos.getWidth(), pos.getHeight(), 45f, 0, 0, (int)pos.getWidth(), (int)pos.getHeight(), false, false);
 		
-        if(velocity < LOWER_CAP/6 && Gdx.input.isKeyPressed(Input.Keys.SPACE)) velocity=UPPER_CAP;
+        if(velocity < LOWER_CAP/2 && Gdx.input.isKeyPressed(Input.Keys.SPACE)) velocity=UPPER_CAP;
         velocity-=0.04f;
         velocity = (float) Math.max(LOWER_CAP, velocity);
         
         y+=velocity*0.012;
+        
+        if (y <= 0) y = 0;
 	}
 	
 	private double getRotation() {
-		return 80.0 * (velocity / Math.abs(UPPER_CAP-LOWER_CAP));
+		return 120.0 * (velocity / Math.abs(UPPER_CAP-LOWER_CAP));
 	}
 	
 	public boolean isDead(List<Tube> tubes, int t) {

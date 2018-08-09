@@ -16,9 +16,9 @@ public class StephansGame extends ApplicationAdapter {
 	
 	private SpriteBatch batch;
 	private ShapeRenderer drawer;
+	private BitmapFont font;
 	private int t;
 	private FlappyBird player;
-	private BitmapFont font;
 	private List<Tube> tubes = new ArrayList<Tube>();
 	private String score;
 	private boolean game_over = false;
@@ -28,7 +28,7 @@ public class StephansGame extends ApplicationAdapter {
 		batch = new SpriteBatch();
 		drawer = new ShapeRenderer();
 		player = new FlappyBird();
-		font = new BitmapFont();
+		font = FontUtils.load("Starlight", 24);
 		
 		for (int n = 0; n<30;n++) {
 			tubes.add(new Tube());
@@ -41,7 +41,7 @@ public class StephansGame extends ApplicationAdapter {
 		Gdx.gl.glClearColor(0.6f, 0.85f, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		if (!game_over) t++;
+		if (!game_over) t+=2;
 		
 		drawer.begin(ShapeType.Filled);
 		drawer.setColor(Color.RED);
@@ -51,7 +51,7 @@ public class StephansGame extends ApplicationAdapter {
 		batch.begin();
 		player.update(batch, t);
 		score = "Score: "+(int)((t+(Gdx.graphics.getWidth()*0.15f))/(Gdx.graphics.getWidth()*Tube.SPACE_BETWEEN));
-		font.draw(batch, score, Gdx.graphics.getWidth()*0.87f, Gdx.graphics.getHeight()*0.95f);
+		font.draw(batch, score, Gdx.graphics.getWidth()*0.57f, Gdx.graphics.getHeight()*0.95f);
 		batch.end();
 		
 		if (!game_over && player.isDead(tubes, t)) {
