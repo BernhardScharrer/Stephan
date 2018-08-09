@@ -1,69 +1,111 @@
 package stephan.reiter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector2;
+
+import stephan.reiter.player.Player;
+import stephan.reiter.utils.FontLoader;
+import stephan.reiter.world.Tile;
+import stephan.reiter.world.World;
+import stephan.reiter.world.WorldGenerator;
 
 public class StephansGame extends ApplicationAdapter {
+
+	private static final int TIME_PER_FRAME = 16;
 	
-	private SpriteBatch batch;
-	private ShapeRenderer drawer;
+	private long ago, delta;
+	
 	private BitmapFont font;
-	private int t;
-	private FlappyBird player;
-	private List<Tube> tubes = new ArrayList<Tube>();
-	private String score;
-	private boolean game_over = false;
+	private SpriteBatch batch;
+	private Texture img;
+	
+	private float size;
+	private Vector2 p_pos;
+	private World world;
+	private Player p;
 	
 	@Override
-	public void create () {
-		batch = new SpriteBatch();
-		drawer = new ShapeRenderer();
-		player = new FlappyBird();
-		font = FontUtils.load("Starlight", 24);
+	public void create() {
 		
-		for (int n = 0; n<30;n++) {
-			tubes.add(new Tube());
+		font = FontLoader.loadFont("f1", 100);
+		batch = new SpriteBatch();
+		
+		img = new Texture("berger.png");
+		
+		world = WorldGenerator.generateWorld();
+		p = new Player();
+		
+		size = ((float) Gdx.graphics.getHeight())/Tile.TILES_ON_SCREEN;
+		
+		p_pos = new Vector2();
+		p_pos.x = Gdx.graphics.getWidth()/3;
+		p_pos.y = Gdx.graphics.getHeight()/2;
+	}
+	
+	@Override
+	public void render() {
+		
+		
+		ago = System.currentTimeMillis();
+		
+		clearScreen();
+
+		p.update(world);
+		
+		batch.begin();
+		
+		drawWorld();
+		drawPlayer();
+		
+		batch.end();
+		
+		delta = System.currentTimeMillis() - ago;
+		if (delta < TIME_PER_FRAME) {
+			try {
+				Thread.sleep(TIME_PER_FRAME-delta);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+			Gdx.app.exit();
+		}
+		
+	}
+	
+	private void clearScreen() {
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		Gdx.gl.glClearColor(1, 1, 1, 1);
+	}
+
+	private void drawPlayer() {
+		System.out.println(Gdx.graphics.getWidth()/3);
+		batch.draw(p.getTexture(), p_pos.x, p_pos.y, size, size*2);
+	}
+
+	private void drawWorld() {
+		
+		for (int y = 0; y < World.WORLD_SIZE_Y; y++) {
+			for (int x = 0; x < World.WORLD_SIZE_X; x++) {
+				if (world.getTile(x, y).isGrounded()) {
+					batch.draw(img, (x-p.pos.x)*size+p_pos.x, (y-p.pos.y)*size+p_pos.y, size, size);
+				}
+			}
 		}
 		
 	}
 
 	@Override
-	public void render () {
-		Gdx.gl.glClearColor(0.6f, 0.85f, 1, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
-		if (!game_over) t+=2;
-		
-		drawer.begin(ShapeType.Filled);
-		drawer.setColor(Color.RED);
-		//drawer.rect(player.getPosition().x, player.getPosition().y, player.getPosition().width, player.getPosition().height);
-		for (Tube tube : tubes) tube.update(drawer, t);
-		drawer.end();
-		batch.begin();
-		player.update(batch, t);
-		score = "Score: "+(int)((t+(Gdx.graphics.getWidth()*0.15f))/(Gdx.graphics.getWidth()*Tube.SPACE_BETWEEN));
-		font.draw(batch, score, Gdx.graphics.getWidth()*0.57f, Gdx.graphics.getHeight()*0.95f);
-		batch.end();
-		
-		if (!game_over && player.isDead(tubes, t)) {
-			game_over  = true;
-		}
-		
+	public void dispose() {
+		font.dispose();
+		batch.dispose();
 	}
 	
-	@Override
-	public void dispose () {
-		batch.dispose();
-		drawer.dispose();
-		player.dispose();
-	}
 }
