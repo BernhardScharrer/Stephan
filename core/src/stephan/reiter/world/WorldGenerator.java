@@ -8,12 +8,14 @@ public class WorldGenerator {
 		for (int y = 0; y < World.WORLD_SIZE_Y; y++) {
 			for (int x = 0; x < World.WORLD_SIZE_X; x++) {
 				
-				boolean ground;
+				boolean solid;
 				
-				if (y <= 4) ground = true;
-				else ground = false;
-				
-				tiles[x][y] = new Tile(ground);
+				if (y < 4) {
+					tiles[x][y] = new Tile(2,1, true);
+				}
+				if (y == 4) {
+					tiles[x][y] = new Tile(1,1, true);
+				}
 				
 			}
 		}

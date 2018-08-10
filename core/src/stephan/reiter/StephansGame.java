@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
 import stephan.reiter.player.Player;
+import stephan.reiter.utils.Assets;
 import stephan.reiter.utils.FontLoader;
 import stephan.reiter.world.Tile;
 import stephan.reiter.world.World;
@@ -46,6 +47,8 @@ public class StephansGame extends ApplicationAdapter {
 		p_pos = new Vector2();
 		p_pos.x = Gdx.graphics.getWidth()/3;
 		p_pos.y = Gdx.graphics.getHeight()/2;
+		
+		Assets.load();
 	}
 	
 	@Override
@@ -86,16 +89,20 @@ public class StephansGame extends ApplicationAdapter {
 	}
 
 	private void drawPlayer() {
-		System.out.println(Gdx.graphics.getWidth()/3);
 		batch.draw(p.getTexture(), p_pos.x, p_pos.y, size, size*2);
 	}
 
 	private void drawWorld() {
 		
+		Tile current;
+		
 		for (int y = 0; y < World.WORLD_SIZE_Y; y++) {
 			for (int x = 0; x < World.WORLD_SIZE_X; x++) {
-				if (world.getTile(x, y).isGrounded()) {
-					batch.draw(img, (x-p.pos.x)*size+p_pos.x, (y-p.pos.y)*size+p_pos.y, size, size);
+				
+				current = world.getTile(x, y);
+				
+				if (current!=null) {
+					batch.draw(Assets.tile_sheet[current.getTile_x()][current.getTile_y()], (x-p.pos.x)*size+p_pos.x, (y-p.pos.y)*size+p_pos.y, size, size);
 				}
 			}
 		}
